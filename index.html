@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOTIB VAI OFFICIAL - Single Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- 1. GLOBAL & BODY STYLES (COMMON) --- */
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #0d1a1b; 
+            color: #00ff80;
+        }
+
+        /* --- Matrix Background (Canvas) --- */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #011311 0%, #000000 100%);
+        }
+
+        /* --- 2. LOGIN PANEL STYLES --- */
+        #loginPanel {
+            position: absolute;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(0, 255, 127, 0.8);
+            width: 300px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 127, 0.5);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        #loginPanel.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+        
+        #loginPanel h1 {
+            color: #00ff80;
+            text-shadow: 0 0 5px #00ff80, 0 0 10px #00ff80;
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        #passwordInput {
+            width: 100%;
+            padding: 12px;
+            padding-right: 40px; 
+            background: #000;
+            border: 2px solid #00ff80;
+            color: #00ff80;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            outline: none;
+            text-align: center;
+            transition: box-shadow 0.3s;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff80;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .neon-button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #00ff80;
+            color: #000;
+            box-shadow: 0 0 10px #00ff80, 0 0 20px rgba(0, 255, 127, 0.6);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .message {
+            color: #00ff80;
+            margin-top: 15px;
+            height: 20px;
+            font-size: 1em;
+        }
+        
+        /* --- 3. RESULT PANEL STYLES (PANEL 2) --- */
+        #resultPanel {
+            /* শুরুতে হাইড থাকবে */
+            display: none; 
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 127, 0.4);
+            box-shadow: 0 0 25px rgba(0, 255, 127, 0.5);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        #resultPanel h1 {
+            font-size: 2.2em;
+            color: #00ff80;
+            text-shadow: 0 0 7px #00ff80, 0 0 15px #00ff80, 0 0 30px rgba(0, 255, 127, 0.8);
+            margin-bottom: 40px;
+        }
+
+        /* --- Result Ball Container --- */
+        #resultBall {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+            background: #000000;
+            
+            border: 3px solid #666; 
+            box-shadow: 0 0 10px #666;
+            transition: all 0.3s ease-in-out;
+            overflow: hidden; 
+        }
+        
+        /* --- Result Ball States (Colors) & Animations --- */
+        .ball-default { border-color: #00ff80; box-shadow: 0 0 15px #00ff80; }
+        .ball-red { border-color: #ff3333; box-shadow: 0 0 15px #ff3333; }
+        .ball-green { border-color: #00ff80; box-shadow: 0 0 15px #00ff80; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin-animation { animation: spin 0.8s linear infinite; }
+
+        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 15px #ff3333; } 50% { box-shadow: 0 0 50px rgba(255, 51, 51, 0.9); } }
+        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 15px #00ff80; } 50% { box-shadow: 0 0 50px rgba(0, 255, 127, 0.9); } }
+        
+        .pulse-red-animation { animation: pulse-red 1.5s infinite alternate; }
+        .pulse-green-animation { animation: pulse-green 1.5s infinite alternate; }
+
+        /* --- Footer Text --- */
+        .footer-text {
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #00ff80;
+            text-shadow: 0 0 5px #00ff80;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    
+    <div id="loginPanel" class="panel-container">
+        <div class="panel">
+            <h1>LOTIB VIP OFFICIAL</h1>
+            
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="Enter Password">
+                <span class="toggle-password" id="togglePassword">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </span>
+            </div>
+
+            <button id="loginButton" class="neon-button">LOGIN</button>
+            <button id="telegramButton" class="neon-button">JOIN TELEGRAM</button>
+            <p id="message" class="message"></p>
+        </div>
+    </div>
+    
+    <div id="resultPanel" class="container">
+        <h1>LOTIB VAI OFFICIAL</h1>
+        <div id="resultBall" class="ball-default">
+            ...
+        </div>
+
+        <p class="footer-text">Powered by LOTIB VAI Quantum AI 99.9% Accuracy</p>
+    </div>
+
+    <script>
+        // --- LOGIN PANEL CONFIG & LOGIC ---
+        const PASSWORD = "88990011"; 
+        const TELEGRAM_URL = "https://t.me/LOTIBVAI"; 
+
+        const loginPanel = document.getElementById('loginPanel');
+        const loginButton = document.getElementById('loginButton');
+        const telegramButton = document.getElementById('telegramButton');
+        const passwordInput = document.getElementById('passwordInput');
+        const messageElement = document.getElementById('message');
+        const togglePassword = document.getElementById('togglePassword');
+        const resultPanel = document.getElementById('resultPanel'); 
+        const resultBall = document.getElementById('resultBall'); // রেজাল্ট বল রেফারেন্স
+
+        function startResultPanel() {
+            // লগইন প্যানেল লুকানো এবং রেজাল্ট প্যানেল দেখানো
+            loginPanel.classList.add('hidden');
+            resultPanel.style.display = 'block'; 
+            
+            // রেজাল্ট প্যানেলের লজিক শুরু করা
+            // প্রথম কলটি বর্তমান/সেভ করা নম্বরটি দেখাবে
+            autoUpdateResult(false); 
+            // 30 সেকেন্ড পর থেকে বাড়ানো শুরু করবে
+            setInterval(autoUpdateResult, INTERVAL_MS);
+        }
+
+        // 1. LOGIN Button Functionality
+        loginButton.addEventListener('click', () => {
+            const enteredPassword = passwordInput.value.trim();
+
+            if (enteredPassword === PASSWORD) {
+                messageElement.style.color = '#33ff99';
+                messageElement.textContent = "ACCESS GRANTED. Opening Panel...";
+                
+                setTimeout(startResultPanel, 1000); 
+
+            } else {
+                messageElement.style.color = '#ff6666';
+                messageElement.textContent = "ACCESS DENIED. Incorrect Password.";
+            }
+        });
+
+        // 2. JOIN TELEGRAM Button Functionality
+        telegramButton.addEventListener('click', () => {
+            window.open(TELEGRAM_URL, '_blank');
+        });
+
+        // 3. Password Toggle Functionality
+        togglePassword.addEventListener('click', function (e) {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+
+
+        // --- RESULT PANEL CONFIG & LOGIC (স্থায়ী স্টোরেজ সহ) ---
+        const INTERVAL_MS = 30000; // 30 seconds
+        const SPIN_TIME_MS = 3000; // 3 seconds spin
+        
+        const STORAGE_KEY = 'lotib_period_number';
+        // **শুরুর সংখ্যা**
+        const INITIAL_PERIOD_NUMBER = BigInt("20251207100050663"); 
+
+        let currentPeriodNumber;
+
+        // স্থায়ী স্টোরেজ থেকে নম্বর লোড করা বা ইনিশিয়াল ভ্যালু সেট করা
+        const savedNumber = localStorage.getItem(STORAGE_KEY);
+        if (savedNumber && BigInt(savedNumber) >= INITIAL_PERIOD_NUMBER) {
+            currentPeriodNumber = BigInt(savedNumber);
+        } else {
+            currentPeriodNumber = INITIAL_PERIOD_NUMBER;
+        }
+        
+        // --- Manual Result Pattern (নতুন প্যাটার্ন) ---
+        const RESULT_PATTERN = [
+            { text: "BIG", isRed: true, special: true },      // 1. big (B I G)
+            { text: "SMALL", isRed: false, special: true },  // 2. small (S M A L L)
+            { text: "BIG", isRed: true, special: false },     // 3. big
+            { text: "SMALL", isRed: false, special: false },  // 4. small
+            { text: "SMALL", isRed: false, special: false },  // 5. small
+            { text: "BIG", isRed: true, special: false },     // 6. big
+            { text: "SMALL", isRed: false, special: false },  // 7. small
+            { text: "BIG", isRed: true, special: false },     // 8. big
+            { text: "SMALL", isRed: false, special: false },  // 9. small
+            { text: "SMALL", isRed: false, special: false },  // 10. small
+            { text: "SMALL", isRed: false, special: false },  // 11. small
+            { text: "BIG", isRed: true, special: false },     // 12. big
+            { text: "SMALL", isRed: false, special: false },  // 13. small
+            { text: "BIG", isRed: true, special: false },     // 14. big
+            { text: "SMALL", isRed: false, special: false },  // 15. small
+            { text: "BIG", isRed: true, special: false },     // 16. big
+            { text: "BIG", isRed: true, special: false },     // 17. big
+            { text: "BIG", isRed: true, special: false },     // 18. big
+            { text: "SMALL", isRed: false, special: false },  // 19. small
+            { text: "BIG", isRed: true, special: false },     // 20. big
+            { text: "SMALL", isRed: false, special: false },  // 21. small
+        ];
+        // প্যাটার্ন ইনডেক্সও সেভ থাকা নম্বরের উপর নির্ভর করে সেট করা
+        let patternIndex = Number(currentPeriodNumber % BigInt(RESULT_PATTERN.length));
+
+        /** Cleans all animation and color classes from the ball. */
+        function resetBallClasses() {
+            resultBall.className = '';
+            resultBall.classList.add('ball-default');
+        }
+
+        /** Handles the automatic result update. */
+        function autoUpdateResult(shouldIncrement = true) {
+            if (shouldIncrement) {
+                // Step 1: Period Number Update (1 করে বাড়বে)
+                currentPeriodNumber += 1n; 
+                // Move to the next pattern index
+                patternIndex = (patternIndex + 1) % RESULT_PATTERN.length;
+            }
+            
+            // **গুরুত্বপূর্ণ:** প্রতিবার আপডেটের সাথে সাথে নম্বরটি localStorage-এ সেভ করা হচ্ছে
+            localStorage.setItem(STORAGE_KEY, currentPeriodNumber.toString());
+
+
+            if (shouldIncrement) {
+                // Step 2: Start Spin Animation (৩ সেকেন্ডের জন্য)
+                resetBallClasses();
+                resultBall.textContent = "";
+                resultBall.classList.add('spin-animation');
+
+                // Step 3: Calculate and Display Result after Spin
+                setTimeout(() => {
+                    // Remove spin animation
+                    resetBallClasses();
+                    resultBall.classList.remove('spin-animation');
+                    
+                    // Get the result from the manual pattern
+                    const currentResult = RESULT_PATTERN[patternIndex];
+                    
+                    // Determine display text 
+                    let displayText = currentResult.text;
+                    if (currentResult.special) {
+                        displayText = currentResult.text === "SMALL" ? "S M A L L" : "B I G";
+                    }
+
+                    // Determine result styling
+                    const resultClass = currentResult.isRed ? 'ball-red' : 'ball-green';
+                    const animationClass = currentResult.isRed ? 'pulse-red-animation' : 'pulse-green-animation';
+
+                    // Display Result
+                    resultBall.textContent = displayText;
+                    resultBall.classList.add(resultClass, animationClass);
+
+                }, SPIN_TIME_MS);
+            } else {
+                // যখন প্রথমবার লোড হচ্ছে (increment ছাড়া), তখন শুধু বর্তমান রেজাল্ট দেখাবে।
+                const currentResult = RESULT_PATTERN[patternIndex];
+
+                let displayText = currentResult.text;
+                if (currentResult.special) {
+                    displayText = currentResult.text === "SMALL" ? "S M A L L" : "B I G";
+                }
+                resultBall.textContent = displayText;
+                resultBall.classList.add(currentResult.isRed ? 'ball-red' : 'ball-green');
+            }
+        }
+
+
+        // --- MATRIX BACKGROUND EFFECT (COMMON) ---
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        const font_size = 18;
+        let columns = Math.floor(width / font_size);
+        const drops = [];
+        for(let i = 0; i < columns; i++) { drops.push(1); }
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*{}[];:|';
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#00FF80'; 
+            ctx.font = font_size + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const x = i * font_size;
+                const y = drops[i] * font_size;
+                ctx.fillText(text, x, y);
+
+                if(drops[i] * font_size > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / font_size);
+            drops.length = 0;
+            for(let i = 0; i < columns; i++) { drops.push(1); }
+        });
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
