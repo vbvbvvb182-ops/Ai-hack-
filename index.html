@@ -1,410 +1,1120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOTIB VAI OFFICIAL - Single Page</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>টাকা আয় করুন - বিজ্ঞাপন দেখুন</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- 1. GLOBAL & BODY STYLES (COMMON) --- */
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Consolas', 'Courier New', monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #0d1a1b; 
-            color: #00ff80;
-        }
-
-        /* --- Matrix Background (Canvas) --- */
-        #matrixCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #011311 0%, #000000 100%);
-        }
-
-        /* --- 2. LOGIN PANEL STYLES --- */
-        #loginPanel {
-            position: absolute;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.95);
-            padding: 40px 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 25px rgba(0, 255, 127, 0.8);
-            width: 300px;
-            text-align: center;
-            border: 1px solid rgba(0, 255, 127, 0.5);
-            transition: opacity 0.5s, transform 0.5s;
-        }
-
-        #loginPanel.hidden {
-            opacity: 0;
-            transform: scale(0.9);
-            pointer-events: none;
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #ff7d4a;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --card-bg: #16213e;
+            --text-color: #e6e6e6;
+            --text-muted: #adb5bd;
         }
         
-        #loginPanel h1 {
-            color: #00ff80;
-            text-shadow: 0 0 5px #00ff80, 0 0 10px #00ff80;
-            font-size: 1.5em;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        #passwordInput {
-            width: 100%;
-            padding: 12px;
-            padding-right: 40px; 
-            background: #000;
-            border: 2px solid #00ff80;
-            color: #00ff80;
-            font-size: 1.1em;
+        * {
             box-sizing: border-box;
-            outline: none;
-            text-align: center;
-            transition: box-shadow 0.3s;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #00ff80;
-            cursor: pointer;
-            z-index: 20;
-        }
-
-        .neon-button {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            background-color: #00ff80;
-            color: #000;
-            box-shadow: 0 0 10px #00ff80, 0 0 20px rgba(0, 255, 127, 0.6);
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        .message {
-            color: #00ff80;
-            margin-top: 15px;
-            height: 20px;
-            font-size: 1em;
+            margin: 0;
+            padding: 0;
         }
         
-        /* --- 3. RESULT PANEL STYLES (PANEL 2) --- */
-        #resultPanel {
-            /* শুরুতে হাইড থাকবে */
-            display: none; 
-            width: 90%;
-            max-width: 400px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(22, 33, 62, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            padding-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
             padding: 20px;
             text-align: center;
-            border: 1px solid rgba(0, 255, 127, 0.4);
-            box-shadow: 0 0 25px rgba(0, 255, 127, 0.5);
-            background: rgba(0, 0, 0, 0.9);
-            border-radius: 10px;
             position: relative;
-            z-index: 10;
+            border-bottom: 5px solid rgba(255, 255, 255, 0.1);
         }
-
-        #resultPanel h1 {
-            font-size: 2.2em;
-            color: #00ff80;
-            text-shadow: 0 0 7px #00ff80, 0 0 15px #00ff80, 0 0 30px rgba(0, 255, 127, 0.8);
-            margin-bottom: 40px;
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
-
-        /* --- Result Ball Container --- */
-        #resultBall {
-            width: 150px;
-            height: 150px;
+        
+        .badge {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .user-card, .stat-card, .progress-container, .referral-section, .rate-info, .withdraw-section, .ad-status {
+            background-color: var(--card-bg);
+            margin: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-card {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             border-radius: 50%;
-            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+            margin-right: 15px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .stat-card p {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .progress-container {
+            background: linear-gradient(to right, #0f0c29, #302b63);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px;
+        }
+        
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(to right, var(--primary-color), #6a11cb);
+            color: white; 
+        }
+        
+        .btn-success { 
+            background: linear-gradient(to right, var(--success-color), #11998e);
+            color: white; 
+        }
+        
+        .btn-danger { 
+            background: linear-gradient(to right, var(--danger-color), #ff416c);
+            color: white; 
+        }
+        
+        .btn-warning { 
+            background: linear-gradient(to right, var(--warning-color), #ff7e5f);
+            color: white; 
+        }
+        
+        .btn-secondary { 
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            color: var(--text-color); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+        }
+        
+        .btn:active { 
+            transform: translateY(0); 
+        }
+        
+        .btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+        
+        .btn i { 
+            margin-right: 8px; 
+            font-size: 18px; 
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .referral-stats {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .referral-link-container {
+            display: flex;
+            margin-top: 15px;
+        }
+        
+        #referral-link {
+            flex: 1;
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px 0 0 8px;
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+        }
+        
+        #copy-referral {
+            padding: 0 15px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #copy-referral:hover {
+            opacity: 0.9;
+        }
+        
+        .withdraw-section { 
+            display: none; 
+        }
+        
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .input-group i.input-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-with-icon {
+            padding-left: 40px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.3);
+        }
+        
+        #withdraw-status {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .success-message { 
+            background-color: rgba(40, 167, 69, 0.2); 
+            color: var(--success-color); 
+        }
+        
+        .error-message { 
+            background-color: rgba(220, 53, 69, 0.2); 
+            color: var(--danger-color); 
+        }
+        
+        .info-message { 
+            background-color: rgba(74, 107, 255, 0.2); 
+            color: var(--primary-color); 
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: var(--card-bg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .notification.info {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse { 
+            animation: pulse 1.5s infinite; 
+        }
+        
+        @keyframes coinAnimation {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .coin-animation {
+            position: absolute;
+            font-size: 24px;
+            color: gold;
+            z-index: 100;
+            animation: coinAnimation 1s forwards;
+        }
+        
+        /* নেভিগেশন বার স্টাইল */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 10px;
+            width: 25%;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(74, 107, 255, 0.2);
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-color);
+        }
+        
+        /* পেজ সেকশন স্টাইল */
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        /* বিজ্ঞাপন কন্টেইনার স্টাইল */
+        .ad-container {
+            margin: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2em;
-            font-weight: bold;
-            color: #fff;
-            background: #000000;
-            
-            border: 3px solid #666; 
-            box-shadow: 0 0 10px #666;
-            transition: all 0.3s ease-in-out;
-            overflow: hidden; 
+            min-height: 90px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
         }
         
-        /* --- Result Ball States (Colors) & Animations --- */
-        .ball-default { border-color: #00ff80; box-shadow: 0 0 15px #00ff80; }
-        .ball-red { border-color: #ff3333; box-shadow: 0 0 15px #ff3333; }
-        .ball-green { border-color: #00ff80; box-shadow: 0 0 15px #00ff80; }
-
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .spin-animation { animation: spin 0.8s linear infinite; }
-
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 15px #ff3333; } 50% { box-shadow: 0 0 50px rgba(255, 51, 51, 0.9); } }
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 15px #00ff80; } 50% { box-shadow: 0 0 50px rgba(0, 255, 127, 0.9); } }
-        
-        .pulse-red-animation { animation: pulse-red 1.5s infinite alternate; }
-        .pulse-green-animation { animation: pulse-green 1.5s infinite alternate; }
-
-        /* --- Footer Text --- */
-        .footer-text {
-            margin-top: 30px;
-            font-size: 0.8em;
-            color: #00ff80;
-            text-shadow: 0 0 5px #00ff80;
-            opacity: 0.8;
+        @media (max-width: 400px) {
+            .header h1 { font-size: 20px; }
+            .stats-container { grid-template-columns: 1fr; }
+            .btn { padding: 12px; font-size: 14px; }
+            .nav-item { font-size: 10px; padding: 5px; }
+            .nav-item i { font-size: 18px; }
         }
     </style>
 </head>
 <body>
-    <canvas id="matrixCanvas"></canvas>
-    
-    <div id="loginPanel" class="panel-container">
-        <div class="panel">
-            <h1>LOTIB VIP OFFICIAL</h1>
-            
-            <div class="input-group">
-                <input type="password" id="passwordInput" placeholder="Enter Password">
-                <span class="toggle-password" id="togglePassword">
-                    <i class="fa-solid fa-eye-slash"></i>
-                </span>
+    <div class="container">
+        <div class="header">
+            <h1>টাকা আয় করুন - বিজ্ঞাপন দেখুন</h1>
+            <p>বিজ্ঞাপন দেখে আসল টাকা আয় করুন</p>
+            <div class="badge">সক্রিয়</div>
+        </div>
+        
+        <div class="ad-container">
+            <center>
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : 'af3ac5da264d48edf05886e0c3d572c2',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/af3ac5da264d48edf05886e0c3d572c2/invoke.js"></script>
+            </center>
+        </div>
+        
+        <div class="page-section active" id="home-page">
+            <div class="user-card">
+                <div class="user-avatar" id="user-avatar">TG</div>
+                <div class="user-info">
+                    <h3 id="user-name">টেলিগ্রাম প্রোফাইল</h3>
+                    <p>আইডি: <span id="user-id">7011834885</span></p>
+                </div>
             </div>
-
-            <button id="loginButton" class="neon-button">LOGIN</button>
-            <button id="telegramButton" class="neon-button">JOIN TELEGRAM</button>
-            <p id="message" class="message"></p>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>দেখা বিজ্ঞাপন</h3>
+                    <p id="watched-ads">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>আয়কৃত টাকা</h3>
+                    <p id="earned-money">0.00 <small>টাকা</small></p>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h3>আজকের অগ্রগতি</h3>
+                    <span id="ads-progress">0/270</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text">
+                    <span>0 টাকা</span>
+                    <span>270 টাকা</span>
+                </div>
+            </div>
+            
+            <div class="ad-status" id="ad-status">
+                <i class="fas fa-check-circle"></i> বিজ্ঞাপন দেখতে প্রস্তুত
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="watch-ad-btn" onclick="watchAd()">
+                    <i class="fas fa-play"></i> বিজ্ঞাপন দেখুন (০.০৯ টাকা)
+                </button>
+                <button class="btn btn-success" id="auto-ad-btn" onclick="startAutoAds()">
+                    <i class="fas fa-robot"></i> স্বয়ংক্রিয় বিজ্ঞাপন
+                </button>
+                <button class="btn btn-danger" id="stop-auto-btn" onclick="stopAutoAds()" disabled>
+                    <i class="fas fa-stop"></i> বন্ধ করুন
+                </button>
+                <button class="btn btn-secondary" onclick="showWithdrawForm()">
+                    <i class="fas fa-wallet"></i> টাকা উত্তোলন
+                </button>
+            </div>
+            
+            <div class="ad-container">
+                <center>
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : 'af3ac5da264d48edf05886e0c3d572c2',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/af3ac5da264d48edf05886e0c3d572c2/invoke.js"></script>
+                </center>
+            </div>
+            
+            <div class="referral-section">
+                <h3 class="section-title"><i class="fas fa-users"></i> বন্ধুকে আমন্ত্রণ করুন</h3>
+                <div class="referral-stats">
+                    <div>আমন্ত্রিত: <strong id="referral-count">0</strong></div>
+                    <div>আয়: <strong id="referral-earnings">0.00</strong> টাকা</div>
+                </div>
+                <p style="font-size: 14px; margin-bottom: 10px;">আপনার রেফারেল লিঙ্ক শেয়ার করুন এবং প্রতিটি বন্ধুর জন্য ৫ টাকা বোনাস পান!</p>
+                <div class="referral-link-container">
+                    <input type="text" id="referral-link" readonly>
+                    <button id="copy-referral" onclick="copyReferralLink()">কপি</button>
+                </div>
+            </div>
+            
+            <div class="rate-info">
+                <p><i class="fas fa-ad"></i> প্রতি বিজ্ঞাপন = ০.০৯ টাকা</p>
+                <p><i class="fas fa-money-bill-wave"></i> ন্যূনতম উত্তোলন: ২৭০ টাকা</p>
+                <p><i class="fas fa-gift"></i> রেফারেল বোনাস: ৫ টাকা প্রতি ব্যবহারকারী</p>
+            </div>
+        </div>
+        
+        <div class="page-section" id="earn-page">
+            <h3 class="section-title"><i class="fas fa-coins"></i> টাকা আয় করার উপায়</h3>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="watch-ad-btn-earn" onclick="watchAd()">
+                    <i class="fas fa-play"></i> বিজ্ঞাপন দেখুন (০.০৯ টাকা)
+                </button>
+                <button class="btn btn-success" id="auto-ad-btn-earn" onclick="startAutoAds()">
+                    <i class="fas fa-robot"></i> স্বয়ংক্রিয় বিজ্ঞাপন
+                </button>
+                <button class="btn btn-danger" id="stop-auto-btn-earn" onclick="stopAutoAds()" disabled>
+                    <i class="fas fa-stop"></i> বন্ধ করুন
+                </button>
+            </div>
+            
+            <div class="referral-section">
+                <h3 class="section-title"><i class="fas fa-users"></i> বন্ধুকে আমন্ত্রণ করুন</h3>
+                <div class="referral-stats">
+                    <div>আমন্ত্রিত: <strong id="referral-count-earn">0</strong></div>
+                    <div>আয়: <strong id="referral-earnings-earn">0.00</strong> টাকা</div>
+                </div>
+                <p style="font-size: 14px; margin-bottom: 10px;">আপনার রেফারেল লিঙ্ক শেয়ার করুন এবং প্রতিটি বন্ধুর জন্য ৫ টাকা বোনাস পান!</p>
+                <div class="referral-link-container">
+                    <input type="text" id="referral-link-earn" readonly>
+                    <button id="copy-referral-earn" onclick="copyReferralLink()">কপি</button>
+                </div>
+            </div>
+            
+            <div class="rate-info">
+                <p><i class="fas fa-ad"></i> প্রতি বিজ্ঞাপন = ০.০৯ টাকা</p>
+                <p><i class="fas fa-gift"></i> রেফারেল বোনাস: ৫ টাকা প্রতি ব্যবহারকারী</p>
+            </div>
+        </div>
+        
+        <div class="page-section" id="withdraw-page">
+            <h3 class="section-title"><i class="fas fa-wallet"></i> টাকা উত্তোলন</h3>
+            
+            <div class="stat-card">
+                <h3>মোট আয়</h3>
+                <p id="total-earned-withdraw">0.00 <small>টাকা</small></p>
+            </div>
+            
+            <div class="withdraw-section" id="withdraw-section">
+                <div class="form-group">
+                    <label for="withdraw-amount">পরিমাণ (টাকা)</label>
+                    <div class="input-group">
+                        <i class="fas fa-money-bill-wave input-icon"></i>
+                        <input type="number" id="withdraw-amount" class="form-control form-control-with-icon" placeholder="টাকার পরিমাণ লিখুন" min="270">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="payment-method">পেমেন্ট মাধ্যম</label>
+                    <div class="input-group">
+                        <i class="fas fa-credit-card input-icon"></i>
+                        <select id="payment-method" class="form-control form-control-with-icon">
+                            <option value="" disabled selected>পেমেন্ট মাধ্যম নির্বাচন করুন</option>
+                            <option value="bkash">bKash (+)</option>
+                            <option value="nagad">Nagad</option>
+                            <option value="rocket">Rocket</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-phone">বিকাশ (+) / নগদ / রকেট নম্বর এড করুন</label>
+                    <div class="input-group">
+                        <i class="fas fa-plus-circle input-icon"></i>
+                        <input type="text" id="withdraw-phone" class="form-control form-control-with-icon" placeholder="01XXXXXXXXX" pattern="01[3-9]{1}[0-9]{8}">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="withdrawPoints()">
+                    <i class="fas fa-paper-plane"></i> অনুরোধ পাঠান
+                </button>
+                <div id="withdraw-status"></div>
+            </div>
+            
+            <div class="rate-info">
+                <p><i class="fas fa-money-bill-wave"></i> ন্যূনতম উত্তোলন: ২৭০ টাকা</p>
+                <p><i class="fas fa-clock"></i> উত্তোলন প্রসেসিং সময়: ২৪-৪৮ ঘন্টা</p>
+            </div>
+        </div>
+        
+        <div class="page-section" id="notice-page">
+            <h3 class="section-title"><i class="fas fa-bell"></i> নোটিশ ও আপডেট</h3>
+            
+            <div class="notification-list">
+                <div class="stat-card">
+                    <h3><i class="fas fa-info-circle"></i> নতুন আপডেট ২০২৬</h3>
+                    <p>স্বয়ংক্রিয় বিজ্ঞাপন সিস্টেম চালু হয়েছে। এখন থেকে স্বয়ংক্রিয়ভাবে বিজ্ঞাপন দেখে টাকা আয় করতে পারবেন।</p>
+                    <small>২ দিন আগে</small>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-gift"></i> বিশেষ অফার</h3>
+                    <p>এই সপ্তাহে অতিরিক্ত ১০% বোনাস পেতে আপনার বন্ধুদের আমন্ত্রণ করুন।</p>
+                    <small>৫ দিন আগে</small>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> গুরুত্বপূর্ণ নোটিশ</h3>
+                    <p>উত্তোলনের জন্য ন্যূনতম ২৭০ টাকা প্রয়োজন। দয়া করে উত্তোলন করার আগে নিশ্চিত হয়ে নিন।</p>
+                    <small>১ সপ্তাহ আগে</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© ২০২৬ টাকা আয় করুন অ্যাপ। সকল অধিকার সংরক্ষিত।</p>
         </div>
     </div>
-    
-    <div id="resultPanel" class="container">
-        <h1>LOTIB VAI OFFICIAL</h1>
-        <div id="resultBall" class="ball-default">
-            ...
-        </div>
 
-        <p class="footer-text">Powered by LOTIB VAI Quantum AI 99.9% Accuracy</p>
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="showPage('home-page', this)">
+            <i class="fas fa-home"></i>
+            <span>হোম</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('earn-page', this)">
+            <i class="fas fa-coins"></i>
+            <span>আর্ন</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('withdraw-page', this)">
+            <i class="fas fa-wallet"></i>
+            <span>উত্তোলন</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('notice-page', this)">
+            <i class="fas fa-bell"></i>
+            <span>নোটিশ</span>
+        </a>
+    </div>
+
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text"></span>
     </div>
 
     <script>
-        // --- LOGIN PANEL CONFIG & LOGIC ---
-        const PASSWORD = "88990011"; 
-        const TELEGRAM_URL = "https://t.me/LOTIBVAI"; 
+        // Constants
+        const POINTS_PER_AD = 0.09; // প্রতি বিজ্ঞাপনে ০.০৯ টাকা
+        const MIN_WITHDRAW_TAKA = 270; // ন্যূনতম উত্তোলন ২৭০ টাকা
+        const REFERRAL_BONUS = 5.00; // রেফারেল বোনাস ৫ টাকা
+        
+        // Telegram Bot Configuration
+        const BOT_TOKEN = "7987524748:AAHmv52bPWjGpWLzvexVBGZ6P5vACjInNzE"; // আপনার বট টোকেন
+        const ADMIN_CHAT_ID = "7011834885"; // আপনার টেলিগ্রাম চ্যাট আইডি
+        
+        // Variables
+        let watchedAdsCount = 0;
+        let earnedPoints = 0.00;
+        let referralCount = 0;
+        let referralEarnings = 0.00;
+        let userId = generateUserId();
+        let isAutoMode = false;
+        let isAdLoading = false;
 
-        const loginPanel = document.getElementById('loginPanel');
-        const loginButton = document.getElementById('loginButton');
-        const telegramButton = document.getElementById('telegramButton');
-        const passwordInput = document.getElementById('passwordInput');
-        const messageElement = document.getElementById('message');
-        const togglePassword = document.getElementById('togglePassword');
-        const resultPanel = document.getElementById('resultPanel'); 
-        const resultBall = document.getElementById('resultBall'); // রেজাল্ট বল রেফারেন্স
-
-        function startResultPanel() {
-            // লগইন প্যানেল লুকানো এবং রেজাল্ট প্যানেল দেখানো
-            loginPanel.classList.add('hidden');
-            resultPanel.style.display = 'block'; 
+        // Initialize the app
+        function initApp() {
+            checkReferral();
             
-            // রেজাল্ট প্যানেলের লজিক শুরু করা
-            // প্রথম কলটি বর্তমান/সেভ করা নম্বরটি দেখাবে
-            autoUpdateResult(false); 
-            // 30 সেকেন্ড পর থেকে বাড়ানো শুরু করবে
-            setInterval(autoUpdateResult, INTERVAL_MS);
+            // সেট ইউজার আইডি (টেলিগ্রাম প্রোফাইল আইডি)
+            document.getElementById('user-id').textContent = userId;
+            document.getElementById('user-avatar').textContent = "TG";
+            
+            loadUserData();
+            updateUI();
+            
+            generateReferralLink();
         }
 
-        // 1. LOGIN Button Functionality
-        loginButton.addEventListener('click', () => {
-            const enteredPassword = passwordInput.value.trim();
+        // পেজ দেখানোর ফাংশন
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            element.classList.add('active');
+            
+            if (pageId === 'withdraw-page') {
+                document.getElementById('total-earned-withdraw').textContent = (earnedPoints + referralEarnings).toFixed(2);
+            }
+            
+            if (pageId === 'earn-page') {
+                document.getElementById('referral-count-earn').textContent = referralCount;
+                document.getElementById('referral-earnings-earn').textContent = referralEarnings.toFixed(2);
+                document.getElementById('referral-link-earn').value = document.getElementById('referral-link').value;
+            }
+        }
 
-            if (enteredPassword === PASSWORD) {
-                messageElement.style.color = '#33ff99';
-                messageElement.textContent = "ACCESS GRANTED. Opening Panel...";
+        // টেলিগ্রাম প্রোফাইল আইডির জন্য ডেমো ডাটা অথবা স্টোরেজ ডাটা রিটার্ন করবে
+        function generateUserId() {
+            if (localStorage.getItem('userId')) {
+                return localStorage.getItem('userId');
+            }
+            const tgId = "7011834885";
+            localStorage.setItem('userId', tgId);
+            return tgId;
+        }
+
+        // Check referral
+        function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrerId = urlParams.get('start');
+            
+            if (referrerId && referrerId !== userId) {
+                if (!localStorage.getItem('referredBy')) {
+                    localStorage.setItem('referredBy', referrerId);
+                    showNotification('আপনি একটি রেফারেল লিঙ্ক ব্যবহার করে যোগদান করেছেন!', 'success');
+                }
+            }
+        }
+
+        // আপনার টেলিগ্রাম বট লিংক দিয়ে রেফারেল লিংক জেনারেট
+        function generateReferralLink() {
+            const referralLink = `https://t.me/earnmoneyfree00_bot?start=${userId}`;
+            document.getElementById('referral-link').value = referralLink;
+        }
+
+        // কপি রেফারেল লিংক
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referral-link');
+            referralLink.select();
+            document.execCommand('copy');
+            
+            const copyBtn = document.getElementById('copy-referral');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'কপি হয়েছে!';
+            copyBtn.style.background = 'var(--success-color)';
+            
+            showNotification('রেফারেল লিঙ্ক কপি করা হয়েছে!', 'success');
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.style.background = 'linear-gradient(to right, var(--primary-color), var(--secondary-color))';
+            }, 2000);
+        }
+
+        // Load user data
+        function loadUserData() {
+            if (localStorage.getItem('watchedAdsCount')) {
+                watchedAdsCount = parseInt(localStorage.getItem('watchedAdsCount'));
+            }
+            
+            if (localStorage.getItem('earnedPoints')) {
+                earnedPoints = parseFloat(localStorage.getItem('earnedPoints'));
+            }
+            
+            if (localStorage.getItem('referralCount')) {
+                referralCount = parseInt(localStorage.getItem('referralCount'));
+            }
+            
+            if (localStorage.getItem('referralEarnings')) {
+                referralEarnings = parseFloat(localStorage.getItem('referralEarnings'));
+            }
+        }
+
+        // Save user data
+        function saveUserData() {
+            localStorage.setItem('watchedAdsCount', watchedAdsCount);
+            localStorage.setItem('earnedPoints', earnedPoints.toFixed(4));
+            localStorage.setItem('referralCount', referralCount);
+            localStorage.setItem('referralEarnings', referralEarnings.toFixed(2));
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('watched-ads').textContent = watchedAdsCount;
+            document.getElementById('earned-money').textContent = (earnedPoints + referralEarnings).toFixed(2);
+            document.getElementById('referral-count').textContent = referralCount;
+            document.getElementById('referral-earnings').textContent = referralEarnings.toFixed(2);
+            updateProgress();
+        }
+
+        // Update progress
+        function updateProgress() {
+            const progressPercent = ((earnedPoints + referralEarnings) / MIN_WITHDRAW_TAKA) * 100;
+            document.getElementById('progress-fill').style.width = `${Math.min(progressPercent, 100)}%`;
+            document.getElementById('ads-progress').textContent = `${(earnedPoints + referralEarnings).toFixed(2)}/${MIN_WITHDRAW_TAKA} টাকা`;
+        }
+
+        // Watch Ad (Direct link trigger)
+        function watchAd() {
+            if (isAdLoading) return;
+
+            isAdLoading = true;
+            document.getElementById('watch-ad-btn').disabled = true;
+            document.getElementById('watch-ad-btn-earn').disabled = true;
+            document.getElementById('ad-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> বিজ্ঞাপন লোড হচ্ছে...';
+            
+            try {
+                // আপনার Monetag Direct Link এখানে ওপেন হবে
+                const adWindow = window.open('https://omg10.com/4/10984818', '_blank');
                 
-                setTimeout(startResultPanel, 1000); 
-
-            } else {
-                messageElement.style.color = '#ff6666';
-                messageElement.textContent = "ACCESS DENIED. Incorrect Password.";
+                if (adWindow) {
+                    watchedAdsCount++;
+                    earnedPoints += POINTS_PER_AD;
+                    
+                    saveUserData();
+                    updateUI();
+                    document.getElementById('ad-status').innerHTML = '<i class="fas fa-check-circle"></i> বিজ্ঞাপন সফলভাবে দেখা হয়েছে!';
+                    
+                    createCoinAnimation();
+                    
+                    showNotification(`০.০৯ টাকা যোগ হয়েছে! আপনার ব্যালেন্স: ${(earnedPoints + referralEarnings).toFixed(2)} টাকা`, 'success');
+                    
+                    if (earnedPoints + referralEarnings >= MIN_WITHDRAW_TAKA) {
+                        showNotification(`অভিনন্দন! আপনি উত্তোলনের জন্য ${MIN_WITHDRAW_TAKA} টাকা সংগ্রহ করেছেন।`, 'info');
+                    }
+                    
+                    if (isAutoMode) {
+                        setTimeout(() => {
+                            isAdLoading = false;
+                            document.getElementById('watch-ad-btn').disabled = false;
+                            document.getElementById('watch-ad-btn-earn').disabled = false;
+                            watchAd();
+                        }, 10000);
+                    } else {
+                        isAdLoading = false;
+                        document.getElementById('watch-ad-btn').disabled = false;
+                        document.getElementById('watch-ad-btn-earn').disabled = false;
+                    }
+                } else {
+                    document.getElementById('ad-status').innerHTML = '<i class="fas fa-exclamation-circle"></i> পপ-আপ ব্লক করা আছে! দয়া করে ব্রাউজারে পপ-আপ অ্যালাউ (Allow) করুন।';
+                    isAdLoading = false;
+                    document.getElementById('watch-ad-btn').disabled = false;
+                    document.getElementById('watch-ad-btn-earn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Error in ad system:', error);
+                document.getElementById('ad-status').innerHTML = '<i class="fas fa-exclamation-triangle"></i> বিজ্ঞাপনে ত্রুটি ঘটেছে।';
+                isAdLoading = false;
+                document.getElementById('watch-ad-btn').disabled = false;
+                document.getElementById('watch-ad-btn-earn').disabled = false;
             }
-        });
-
-        // 2. JOIN TELEGRAM Button Functionality
-        telegramButton.addEventListener('click', () => {
-            window.open(TELEGRAM_URL, '_blank');
-        });
-
-        // 3. Password Toggle Functionality
-        togglePassword.addEventListener('click', function (e) {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.querySelector('i').classList.toggle('fa-eye');
-            this.querySelector('i').classList.toggle('fa-eye-slash');
-        });
-
-
-        // --- RESULT PANEL CONFIG & LOGIC (স্থায়ী স্টোরেজ সহ) ---
-        const INTERVAL_MS = 30000; // 30 seconds
-        const SPIN_TIME_MS = 3000; // 3 seconds spin
-        
-        const STORAGE_KEY = 'lotib_period_number';
-        // **শুরুর সংখ্যা**
-        const INITIAL_PERIOD_NUMBER = BigInt("20251207100050663"); 
-
-        let currentPeriodNumber;
-
-        // স্থায়ী স্টোরেজ থেকে নম্বর লোড করা বা ইনিশিয়াল ভ্যালু সেট করা
-        const savedNumber = localStorage.getItem(STORAGE_KEY);
-        if (savedNumber && BigInt(savedNumber) >= INITIAL_PERIOD_NUMBER) {
-            currentPeriodNumber = BigInt(savedNumber);
-        } else {
-            currentPeriodNumber = INITIAL_PERIOD_NUMBER;
-        }
-        
-        // --- Manual Result Pattern (নতুন প্যাটার্ন) ---
-        const RESULT_PATTERN = [
-            { text: "BIG", isRed: true, special: true },      // 1. big (B I G)
-            { text: "SMALL", isRed: false, special: true },  // 2. small (S M A L L)
-            { text: "BIG", isRed: true, special: false },     // 3. big
-            { text: "SMALL", isRed: false, special: false },  // 4. small
-            { text: "SMALL", isRed: false, special: false },  // 5. small
-            { text: "BIG", isRed: true, special: false },     // 6. big
-            { text: "SMALL", isRed: false, special: false },  // 7. small
-            { text: "BIG", isRed: true, special: false },     // 8. big
-            { text: "SMALL", isRed: false, special: false },  // 9. small
-            { text: "SMALL", isRed: false, special: false },  // 10. small
-            { text: "SMALL", isRed: false, special: false },  // 11. small
-            { text: "BIG", isRed: true, special: false },     // 12. big
-            { text: "SMALL", isRed: false, special: false },  // 13. small
-            { text: "BIG", isRed: true, special: false },     // 14. big
-            { text: "SMALL", isRed: false, special: false },  // 15. small
-            { text: "BIG", isRed: true, special: false },     // 16. big
-            { text: "BIG", isRed: true, special: false },     // 17. big
-            { text: "BIG", isRed: true, special: false },     // 18. big
-            { text: "SMALL", isRed: false, special: false },  // 19. small
-            { text: "BIG", isRed: true, special: false },     // 20. big
-            { text: "SMALL", isRed: false, special: false },  // 21. small
-        ];
-        // প্যাটার্ন ইনডেক্সও সেভ থাকা নম্বরের উপর নির্ভর করে সেট করা
-        let patternIndex = Number(currentPeriodNumber % BigInt(RESULT_PATTERN.length));
-
-        /** Cleans all animation and color classes from the ball. */
-        function resetBallClasses() {
-            resultBall.className = '';
-            resultBall.classList.add('ball-default');
         }
 
-        /** Handles the automatic result update. */
-        function autoUpdateResult(shouldIncrement = true) {
-            if (shouldIncrement) {
-                // Step 1: Period Number Update (1 করে বাড়বে)
-                currentPeriodNumber += 1n; 
-                // Move to the next pattern index
-                patternIndex = (patternIndex + 1) % RESULT_PATTERN.length;
+        // Coin Animation
+        function createCoinAnimation() {
+            const button = document.getElementById('watch-ad-btn');
+            const rect = button.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            const coin = document.createElement('div');
+            coin.className = 'coin-animation';
+            coin.innerHTML = '<i class="fas fa-coins"></i>';
+            coin.style.left = `${x}px`;
+            coin.style.top = `${y}px`;
+            document.body.appendChild(coin);
+            
+            setTimeout(() => {
+                document.body.removeChild(coin);
+            }, 1000);
+        }
+
+        // Auto ad controls
+        function startAutoAds() {
+            isAutoMode = true;
+            document.getElementById('auto-ad-btn').disabled = true;
+            document.getElementById('auto-ad-btn-earn').disabled = true;
+            document.getElementById('stop-auto-btn').disabled = false;
+            document.getElementById('stop-auto-btn-earn').disabled = false;
+            document.getElementById('watch-ad-btn').disabled = true;
+            document.getElementById('watch-ad-btn-earn').disabled = true;
+            document.getElementById('ad-status').innerHTML = '<i class="fas fa-robot"></i> স্বয়ংক্রিয় বিজ্ঞাপন মোড চালু';
+            
+            watchAd();
+        }
+
+        function stopAutoAds() {
+            isAutoMode = false;
+            document.getElementById('auto-ad-btn').disabled = false;
+            document.getElementById('auto-ad-btn-earn').disabled = false;
+            document.getElementById('stop-auto-btn').disabled = true;
+            document.getElementById('stop-auto-btn-earn').disabled = true;
+            document.getElementById('watch-ad-btn').disabled = false;
+            document.getElementById('watch-ad-btn-earn').disabled = false;
+            document.getElementById('ad-status').innerHTML = '<i class="fas fa-check-circle"></i> স্বয়ংক্রিয় বিজ্ঞাপন মোড বন্ধ';
+        }
+
+        // Show withdraw form
+        function showWithdrawForm() {
+            showPage('withdraw-page', document.querySelector('.nav-item:nth-child(3)'));
+            
+            const totalEarnings = earnedPoints + referralEarnings;
+            
+            if (totalEarnings < MIN_WITHDRAW_TAKA) {
+                document.getElementById('withdraw-status').textContent = 
+                    `ন্যূনতম উত্তোলন পরিমাণ ${MIN_WITHDRAW_TAKA} টাকা। আপনার আছে ${totalEarnings.toFixed(2)} টাকা।`;
+                document.getElementById('withdraw-status').className = 'error-message';
+                document.getElementById('withdraw-section').style.display = 'block';
+                return;
             }
             
-            // **গুরুত্বপূর্ণ:** প্রতিবার আপডেটের সাথে সাথে নম্বরটি localStorage-এ সেভ করা হচ্ছে
-            localStorage.setItem(STORAGE_KEY, currentPeriodNumber.toString());
+            document.getElementById('withdraw-amount').value = '';
+            document.getElementById('withdraw-amount').placeholder = `সর্বোচ্চ: ${totalEarnings.toFixed(2)} টাকা`;
+            document.getElementById('withdraw-amount').max = totalEarnings.toFixed(2);
+            document.getElementById('withdraw-phone').value = '';
+            document.getElementById('payment-method').selectedIndex = 0;
+            document.getElementById('withdraw-status').textContent = '';
+            document.getElementById('withdraw-section').style.display = 'block';
+        }
 
+        // Withdraw execution
+        function withdrawPoints() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const paymentMethod = document.getElementById('payment-method').value;
+            const phoneNumber = document.getElementById('withdraw-phone').value;
+            const totalEarnings = earnedPoints + referralEarnings;
+            const withdrawStatus = document.getElementById('withdraw-status');
+            
+            if (!amount || isNaN(amount)) {
+                withdrawStatus.textContent = 'দয়া করে একটি বৈধ পরিমাণ লিখুন।';
+                withdrawStatus.className = 'error-message';
+                return;
+            }
+            
+            if (amount < MIN_WITHDRAW_TAKA) {
+                withdrawStatus.textContent = `ন্যূনতম উত্তোলন পরিমাণ ${MIN_WITHDRAW_TAKA} টাকা।`;
+                withdrawStatus.className = 'error-message';
+                return;
+            }
+            
+            if (amount > totalEarnings) {
+                withdrawStatus.textContent = `পর্যাপ্ত ব্যালেন্স নেই। আপনার আছে ${totalEarnings.toFixed(2)} টাকা।`;
+                withdrawStatus.className = 'error-message';
+                return;
+            }
+            
+            if (!paymentMethod) {
+                withdrawStatus.textContent = 'দয়া করে একটি পেমেন্ট মাধ্যম নির্বাচন করুন।';
+                withdrawStatus.className = 'error-message';
+                return;
+            }
+            
+            if (!phoneNumber || !/^01[3-9][0-9]{8}$/.test(phoneNumber)) {
+                withdrawStatus.textContent = 'দয়া করে একটি বৈধ বাংলাদেশী মোবাইল নম্বর লিখুন।';
+                withdrawStatus.className = 'error-message';
+                return;
+            }
+            
+            let remainingAmount = amount;
+            
+            if (referralEarnings > 0) {
+                const referralDeduction = Math.min(referralEarnings, remainingAmount);
+                referralEarnings -= referralDeduction;
+                remainingAmount -= referralDeduction;
+            }
+            
+            if (remainingAmount > 0) {
+                earnedPoints -= remainingAmount;
+                if (earnedPoints < 0) earnedPoints = 0;
+            }
+            
+            saveUserData();
+            updateUI();
+            
+            const message = `📌 নতুন উত্তোলন অনুরোধ 📌\n\n` +
+                             `👤 ব্যবহারকারী টেলিগ্রাম আইডি: ${userId}\n` +
+                             `💰 পরিমাণ: ${amount} টাকা\n` +
+                             `📱 মাধ্যম: ${paymentMethod.toUpperCase()}\n` +
+                             `📞 ফোন: ${phoneNumber}\n\n` +
+                             `📊 দেখা বিজ্ঞাপন: ${watchedAdsCount}\n` +
+                             `👥 আমন্ত্রিত: ${referralCount}\n` +
+                             `💵 মোট আয়: ${totalEarnings.toFixed(2)} টাকা`;
+            
+            sendWithdrawRequestToAdmin(message);
+            
+            withdrawStatus.textContent = 'উত্তোলন অনুরোধ সফলভাবে জমা দেওয়া হয়েছে! প্রসেসিং করতে ২৪-৪৮ ঘন্টা সময় লাগতে পারে।';
+            withdrawStatus.className = 'success-message';
+            
+            showNotification('আপনার উত্তোলন অনুরোধ পাঠানো হয়েছে!', 'success');
+            
+            setTimeout(() => {
+                document.getElementById('withdraw-section').style.display = 'none';
+            }, 3000);
+        }
 
-            if (shouldIncrement) {
-                // Step 2: Start Spin Animation (৩ সেকেন্ডের জন্য)
-                resetBallClasses();
-                resultBall.textContent = "";
-                resultBall.classList.add('spin-animation');
-
-                // Step 3: Calculate and Display Result after Spin
-                setTimeout(() => {
-                    // Remove spin animation
-                    resetBallClasses();
-                    resultBall.classList.remove('spin-animation');
-                    
-                    // Get the result from the manual pattern
-                    const currentResult = RESULT_PATTERN[patternIndex];
-                    
-                    // Determine display text 
-                    let displayText = currentResult.text;
-                    if (currentResult.special) {
-                        displayText = currentResult.text === "SMALL" ? "S M A L L" : "B I G";
+        // Send to Telegram
+        function sendWithdrawRequestToAdmin(message) {
+            const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        console.log('উত্তোলন অনুরোধ অ্যাডমিনকে পাঠানো হয়েছে');
+                    } else {
+                        console.error('উত্তোলন অনুরোধ পাঠানো যায়নি:', data);
                     }
-
-                    // Determine result styling
-                    const resultClass = currentResult.isRed ? 'ball-red' : 'ball-green';
-                    const animationClass = currentResult.isRed ? 'pulse-red-animation' : 'pulse-green-animation';
-
-                    // Display Result
-                    resultBall.textContent = displayText;
-                    resultBall.classList.add(resultClass, animationClass);
-
-                }, SPIN_TIME_MS);
-            } else {
-                // যখন প্রথমবার লোড হচ্ছে (increment ছাড়া), তখন শুধু বর্তমান রেজাল্ট দেখাবে।
-                const currentResult = RESULT_PATTERN[patternIndex];
-
-                let displayText = currentResult.text;
-                if (currentResult.special) {
-                    displayText = currentResult.text === "SMALL" ? "S M A L L" : "B I G";
-                }
-                resultBall.textContent = displayText;
-                resultBall.classList.add(currentResult.isRed ? 'ball-red' : 'ball-green');
-            }
+                })
+                .catch(error => console.error('মেসেজ পাঠাতে ত্রুটি:', error));
         }
 
-
-        // --- MATRIX BACKGROUND EFFECT (COMMON) ---
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-        const font_size = 18;
-        let columns = Math.floor(width / font_size);
-        const drops = [];
-        for(let i = 0; i < columns; i++) { drops.push(1); }
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*{}[];:|';
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#00FF80'; 
-            ctx.font = font_size + 'px monospace';
-
-            for(let i = 0; i < drops.length; i++) {
-                const text = characters.charAt(Math.floor(Math.random() * characters.length));
-                const x = i * font_size;
-                const y = drops[i] * font_size;
-                ctx.fillText(text, x, y);
-
-                if(drops[i] * font_size > height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            columns = Math.floor(width / font_size);
-            drops.length = 0;
-            for(let i = 0; i < columns; i++) { drops.push(1); }
-        });
-        setInterval(drawMatrix, 50);
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
