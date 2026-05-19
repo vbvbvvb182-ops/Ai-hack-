@@ -3,105 +3,509 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earning FK - Profile Dashboard</title>
+    <title>Earning FK - Official Mini App</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121214;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0f0f12;
             color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             min-height: 100vh;
             padding: 20px;
         }
-        .header {
+        .profile-card {
             width: 100%;
             max-width: 400px;
-            display: flex;
-            align-items: center;
-            background: #1c1c1e;
+            background: #1a1a1e;
             padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #2c2c2e;
-        }
-        .profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b5de5, #f15bb5);
-            margin-right: 15px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
+            border: 1px solid #2b2b32;
+            margin-bottom: 15px;
         }
-        .user-info h3 { font-size: 16px; color: #fff; }
-        .user-info p { font-size: 12px; color: #8e8e93; }
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #34495e;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #00d2ff;
+        }
+        .user-details h3 { font-size: 16px; font-weight: 600; }
+        .user-details p { font-size: 12px; color: #a0a0a5; margin-top: 2px; }
 
         .balance-card {
             width: 100%;
             max-width: 400px;
-            background: #1c1c1e;
-            border-radius: 16px;
+            background: linear-gradient(135deg, #1e1e24, #121215);
+            border-radius: 20px;
             padding: 25px;
             text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid #2c2c2e;
+            border: 1px solid #2b2b32;
+            margin-bottom: 15px;
         }
-        .balance-card p { font-size: 14px; color: #aeaeb2; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-card h1 { font-size: 36px; color: #f15bb5; margin: 10px 0; }
+        .balance-card span { font-size: 13px; color: #a0a0a5; text-transform: uppercase; letter-spacing: 1px; }
+        .balance-card h1 { font-size: 42px; color: #00d2ff; margin: 8px 0; font-weight: 700; }
 
-        .stats-container {
-            display: flex;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             width: 100%;
             max-width: 400px;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         .stat-box {
-            flex: 1;
-            background: #1c1c1e;
+            background: #1a1a1e;
             padding: 15px;
             border-radius: 12px;
             text-align: center;
-            border: 1px solid #2c2c2e;
+            border: 1px solid #2b2b32;
         }
-        .stat-box span { font-size: 12px; color: #8e8e93; }
-        .stat-box h2 { font-size: 20px; color: #00f5d4; margin-top: 5px; }
+        .stat-box p { font-size: 12px; color: #a0a0a5; }
+        .stat-box h2 { font-size: 22px; color: #00ffaa; margin-top: 5px; }
 
-        .btn-click-ad {
+        .refer-card {
             width: 100%;
             max-width: 400px;
-            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            background: #1a1a1e;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #2b2b32;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .refer-code {
+            background: #0f0f12;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #ffda79;
+            display: inline-block;
+            margin-top: 5px;
+            border: 1px dashed #ffda79;
+        }
+
+        .action-btn {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #00d2ff, #0066ff);
             color: white;
             border: none;
             padding: 16px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
-            transition: transform 0.2s, opacity 0.2s;
+            margin-bottom: 12px;
         }
-        .btn-click-ad:active { transform: scale(0.98); }
-        .btn-click-ad:disabled { background: #3a3a3c; color: #8e8e93; box-shadow: none; cursor: not-allowed; }
-
-        .status-text { margin-top: 15px; font-size: 13px; color: #00f5d4; min-height: 20px; }
+        .withdraw-btn { background: #2c2c35; color: #a0a0a5; }
+        .withdraw-btn.active {
+            background: linear-gradient(135deg, #00ffaa, #00aa77);
+            color: #0f0f12;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="profile-pic" id="userInitial">U</div>
-        <div class="user-info">
+    <div class="profile-card">
+        <img id="user_avatar" class="profile-img" src="" alt="User">
+        <div class="user-details">
+            <h3 id="user_name">Loading...</h3>
+            <p id="user_id">ID: 000000</p>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <span>Current Balance</span>
+        <h1>৳ <span id="balance_amount">0.00</span></h1>
+        <p style="font-size: 11px; color: #ff5e62; margin-top: 5px;">নূন্যতম উত্তোলন: ৩০০ টাকা</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <p>Ads Viewed</p>
+            <h2 id="ads_count">0</h2>
+        </div>
+        <div class="stat-box">
+            <p>Total Referral</p>
+            <h2 id="refer_count">0</h2>
+        </div>
+    </div>
+
+    <div class="refer-card">
+        <p>আপনার রেফার কোড (প্রতি রেফারে ৭ টাকা)</p>
+        <div class="refer-code" id="my_refer_code">Loading...</div>
+    </div>
+
+    <button class="action-btn" id="ad_btn" onclick="watchMonetagAd()">Click to Watch Ad (+১০ টাকা)</button>
+    <button class="action-btn withdraw-btn" id="withdraw_btn" onclick="requestWithdraw()">Withdraw Money (৳300 Required)</button>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // আপনার দেওয়া ফায়ারবেস ইউআরএল এখানে সেট করা হয়েছে
+    const firebaseConfig = {
+        databaseURL: "https://hjon-1ece7-default-rtdb.firebaseio.com/" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const monetagLink = "https://omg10.com/4/10984818";
+    let userId = "8015208443"; // আপনার টেলিগ্রাম আইডি ডিফল্ট হিসেবে থাকলো
+    let userName = "Premium User";
+
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+        userName = tg.initDataUnsafe.user.first_name + (tg.initDataUnsafe.user.last_name ? ' ' + tg.initDataUnsafe.user.last_name : '');
+        if (tg.initDataUnsafe.user.photo_url) {
+            document.getElementById('user_avatar').src = tg.initDataUnsafe.user.photo_url;
+        } else {
+            document.getElementById('user_avatar').src = `https://ui-avatars.com/api/?name=${tg.initDataUnsafe.user.first_name}&background=00d2ff&color=fff`;
+        }
+    } else {
+        document.getElementById('user_avatar').src = `https://ui-avatars.com/api/?name=User&background=00d2ff&color=fff`;
+    }
+
+    document.getElementById('user_name').innerText = userName;
+    document.getElementById('user_id').innerText = "ID: " + userId;
+    document.getElementById('my_refer_code').innerText = "REF-" + userId;
+
+    // ডাটাবেজ থেকে ইউজারের তথ্য আনা
+    const userRef = database.ref('users/' + userId);
+    userRef.on('value', (snapshot) => {
+        let data = snapshot.val();
+        if (!data) {
+            data = {
+                balance: 0.00,
+                ads: 0,
+                refers: 0,
+                name: userName
+            };
+            userRef.set(data);
+        }
+        
+        document.getElementById('balance_amount').innerText = data.balance.toFixed(2);
+        document.getElementById('ads_count').innerText = data.ads;
+        document.getElementById('refer_count').innerText = data.refers;
+
+        const wBtn = document.getElementById('withdraw_btn');
+        if (data.balance >= 300) {
+            wBtn.classList.add('active');
+            wBtn.disabled = false;
+            wBtn.innerText = "Withdraw BDT " + data.balance.toFixed(0);
+        } else {
+            wBtn.classList.remove('active');
+            wBtn.disabled = true;
+            wBtn.innerText = "Withdraw Money (৳300 Required)";
+        }
+    });
+
+    // বিজ্ঞাপন দেখা ও ১০ টাকা যোগ হওয়া
+    function watchMonetagAd() {
+        const adBtn = document.getElementById('ad_btn');
+        adBtn.disabled = true;
+        adBtn.innerText = "Opening Ad...";
+
+        tg.openLink(monetagLink, { try_instant_view: false });
+
+        setTimeout(() => {
+            userRef.transaction((currentData) => {
+                if (currentData) {
+                    currentData.ads = (currentData.ads || 0) + 1;
+                    currentData.balance = (currentData.balance || 0) + 10.00; 
+                }
+                return currentData;
+            });
+            adBtn.disabled = false;
+            adBtn.innerText = "Watch Next Ad (+১০ টাকা)";
+            tg.showAlert("সফল! আপনি ১০ টাকা বোনাস পেয়েছেন।");
+        }, 3000); 
+    }
+
+    // উইথড্র রিকোয়েস্ট অ্যাডমিন প্যানেলে পাঠানো
+    function requestWithdraw() {
+        userRef.once('value').then((snapshot) => {
+            let data = snapshot.val();
+            if (data && data.balance >= 300) {
+                database.ref('withdraw_requests/' + userId).set({
+                    userId: userId,
+                    name: userName,
+                    amount: data.balance,
+                    time: new Date().toLocaleString()
+                });
+                tg.showAlert(`আপনার ৳${data.balance} উত্তোলনের অনুরোধটি সফলভাবে জমা হয়েছে!`);
+            }
+        });
+    }
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earning FK - Official Mini App</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0f0f12;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .profile-card {
+            width: 100%;
+            max-width: 400px;
+            background: #1a1a1e;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #2b2b32;
+            margin-bottom: 15px;
+        }
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #34495e;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #00d2ff;
+        }
+        .user-details h3 { font-size: 16px; font-weight: 600; }
+        .user-details p { font-size: 12px; color: #a0a0a5; margin-top: 2px; }
+
+        .balance-card {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #1e1e24, #121215);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid #2b2b32;
+            margin-bottom: 15px;
+        }
+        .balance-card span { font-size: 13px; color: #a0a0a5; text-transform: uppercase; letter-spacing: 1px; }
+        .balance-card h1 { font-size: 42px; color: #00d2ff; margin: 8px 0; font-weight: 700; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            max-width: 400px;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #1a1a1e;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #2b2b32;
+        }
+        .stat-box p { font-size: 12px; color: #a0a0a5; }
+        .stat-box h2 { font-size: 22px; color: #00ffaa; margin-top: 5px; }
+
+        .refer-card {
+            width: 100%;
+            max-width: 400px;
+            background: #1a1a1e;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #2b2b32;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .refer-code {
+            background: #0f0f12;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #ffda79;
+            display: inline-block;
+            margin-top: 5px;
+            border: 1px dashed #ffda79;
+        }
+
+        .action-btn {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #00d2ff, #0066ff);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .withdraw-btn { background: #2c2c35; color: #a0a0a5; }
+        .withdraw-btn.active {
+            background: linear-gradient(135deg, #00ffaa, #00aa77);
+            color: #0f0f12;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <img id="user_avatar" class="profile-img" src="" alt="User">
+        <div class="user-details">
+            <h3 id="user_name">Loading...</h3>
+            <p id="user_id">ID: 000000</p>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <span>Current Balance</span>
+        <h1>৳ <span id="balance_amount">0.00</span></h1>
+        <p style="font-size: 11px; color: #ff5e62; margin-top: 5px;">নূন্যতম উত্তোলন: ৩০০ টাকা</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <p>Ads Viewed</p>
+            <h2 id="ads_count">0</h2>
+        </div>
+        <div class="stat-box">
+            <p>Total Referral</p>
+            <h2 id="refer_count">0</h2>
+        </div>
+    </div>
+
+    <div class="refer-card">
+        <p>আপনার রেফার কোড (প্রতি রেফারে ৭ টাকা)</p>
+        <div class="refer-code" id="my_refer_code">Loading...</div>
+    </div>
+
+    <button class="action-btn" id="ad_btn" onclick="watchMonetagAd()">Click to Watch Ad (+১০ টাকা)</button>
+    <button class="action-btn withdraw-btn" id="withdraw_btn" onclick="requestWithdraw()">Withdraw Money (৳300 Required)</button>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // আপনার দেওয়া ফায়ারবেস ইউআরএল এখানে সেট করা হয়েছে
+    const firebaseConfig = {
+        databaseURL: "https://hjon-1ece7-default-rtdb.firebaseio.com/" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const monetagLink = "https://omg10.com/4/10984818";
+    let userId = "8015208443"; // আপনার টেলিগ্রাম আইডি ডিফল্ট হিসেবে থাকলো
+    let userName = "Premium User";
+
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+        userName = tg.initDataUnsafe.user.first_name + (tg.initDataUnsafe.user.last_name ? ' ' + tg.initDataUnsafe.user.last_name : '');
+        if (tg.initDataUnsafe.user.photo_url) {
+            document.getElementById('user_avatar').src = tg.initDataUnsafe.user.photo_url;
+        } else {
+            document.getElementById('user_avatar').src = `https://ui-avatars.com/api/?name=${tg.initDataUnsafe.user.first_name}&background=00d2ff&color=fff`;
+        }
+    } else {
+        document.getElementById('user_avatar').src = `https://ui-avatars.com/api/?name=User&background=00d2ff&color=fff`;
+    }
+
+    document.getElementById('user_name').innerText = userName;
+    document.getElementById('user_id').innerText = "ID: " + userId;
+    document.getElementById('my_refer_code').innerText = "REF-" + userId;
+
+    // ডাটাবেজ থেকে ইউজারের তথ্য আনা
+    const userRef = database.ref('users/' + userId);
+    userRef.on('value', (snapshot) => {
+        let data = snapshot.val();
+        if (!data) {
+            data = {
+                balance: 0.00,
+                ads: 0,
+                refers: 0,
+                name: userName
+            };
+            userRef.set(data);
+        }
+        
+        document.getElementById('balance_amount').innerText = data.balance.toFixed(2);
+        document.getElementById('ads_count').innerText = data.ads;
+        document.getElementById('refer_count').innerText = data.refers;
+
+        const wBtn = document.getElementById('withdraw_btn');
+        if (data.balance >= 300) {
+            wBtn.classList.add('active');
+            wBtn.disabled = false;
+            wBtn.innerText = "Withdraw BDT " + data.balance.toFixed(0);
+        } else {
+            wBtn.classList.remove('active');
+            wBtn.disabled = true;
+            wBtn.innerText = "Withdraw Money (৳300 Required)";
+        }
+    });
+
+    // বিজ্ঞাপন দেখা ও ১০ টাকা যোগ হওয়া
+    function watchMonetagAd() {
+        const adBtn = document.getElementById('ad_btn');
+        adBtn.disabled = true;
+        adBtn.innerText = "Opening Ad...";
+
+        tg.openLink(monetagLink, { try_instant_view: false });
+
+        setTimeout(() => {
+            userRef.transaction((currentData) => {
+                if (currentData) {
+                    currentData.ads = (currentData.ads || 0) + 1;
+                    currentData.balance = (currentData.balance || 0) + 10.00; 
+                }
+                return currentData;
+            });
+            adBtn.disabled = false;
+            adBtn.innerText = "Watch Next Ad (+১০ টাকা)";
+            tg.showAlert("সফল! আপনি ১০ টাকা বোনাস পেয়েছেন।");
+        }, 3000); 
+    }
+
+    // উইথড্র রিকোয়েস্ট অ্যাডমিন প্যানেলে পাঠানো
+    function requestWithdraw() {
+        userRef.once('value').then((snapshot) => {
+            let data = snapshot.val();
+            if (data && data.balance >= 300) {
+                database.ref('withdraw_requests/' + userId).set({
+                    userId: userId,
+                    name: userName,
+                    amount: data.balance,
+                    time: new Date().toLocaleString()
+                });
+                tg.showAlert(`আপনার ৳${data.balance} উত্তোলনের অনুরোধটি সফলভাবে জমা হয়েছে!`);
+            }
+        });
+    }
+</script>
+</body>
+</html>
             <h3 id="userName">Loading User...</h3>
             <p>Dashboard</p>
         </div>
